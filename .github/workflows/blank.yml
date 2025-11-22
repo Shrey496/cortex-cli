@@ -34,7 +34,30 @@ jobs:
 
       - name: Cortex CLI install
         run: |
-          crtx_resp=$(curl -s "$CORTEX_URL/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" -H "x-xdr-auth-id: $API_ID" -H "Authorization: $API_KEY") && crtx_url=$(echo $crtx_resp | jq -r ".signed_url") && crtx_file=$(echo $crtx_resp | jq -r ".file_name") && curl -o $crtx_file $crtx_url
+          crtx_resp=$(curl -s "$CORTEX_URL/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" \
+            -H "x-xdr-auth-id: $API_ID" \
+            -H "Authorization: $API_KEY") 
+            
+          # Check if the curl command was successful before proceeding
+          if [ $? -ne 0 ] || echo "$crtx_resp" | jq -e '.error_code' > /dev/null; then
+            echo "Failed to retrieve CLI download link. Response: $crtx_resp"
+            exit 1
+          fi
+
+          # Parse the response using jq
+          crtx_url=$(echo $crtx_resp | jq -r ".signed_url")
+          crtx_file=$(echo $crtx_resp | jq -r ".file_name")
+          
+          # Download the file using the signed URL
+          echo "Downloading $crtx_file from signed URL..."
+          curl -o $crtx_file $crtx_url
+          
+          # Make the downloaded file executable
+          chmod +x $crtx_file
+         
+         
+        # crtx_resp=$(curl -s "$CORTEX_URL/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" -H "x-xdr-auth-id: $API_ID" -H "Authorization: $API_KEY") && crtx_url=$(echo $crtx_resp | jq -r ".signed_url") && crtx_file=$(echo $crtx_resp | jq -r ".file_name") && curl -o $crtx_file $crtx_url
+
 
         
       - name: Cortex CLI execution
