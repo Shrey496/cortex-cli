@@ -1,3 +1,5 @@
+[![CI](https://github.com/Shrey496/cortex-cli/actions/workflows/blank.yml/badge.svg)](https://github.com/Shrey496/cortex-cli/actions/workflows/blank.yml)
+
 # Cortex CLI image scan
 
 ### Steps: 
