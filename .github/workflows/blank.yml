@@ -25,9 +25,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
-      -name: Docker check
-       run: |
-        docker info
+      - name: Docker check
+        run: |
+          docker info
 
       - name: Build Docker image
         run: docker build -t ubuntu:18.04 . # Build the image, tagging it 'ubuntu:18.04'
