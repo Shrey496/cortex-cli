@@ -25,5 +25,19 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v4
 
+      -name: Docker check
+       run: |
+        docker info
+
       - name: Build Docker image
         run: docker build -t ubuntu:18.04 . # Build the image, tagging it 'ubuntu:18.04'
+
+      - name: Cortex CLI install
+        run: |
+          crtx_resp=$(curl -s "$CORTEX_URL/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" -H "x-xdr-auth-id: $API_ID" -H "Authorization: $API_KEY") && crtx_url=$(echo $crtx_resp | jq -r ".signed_url") && crtx_file=$(echo $crtx_resp | jq -r ".file_name") && curl -o $crtx_file $crtx_url
+
+        
+      - name: Cortex CLI execution
+        run: |
+          sudo ./cortexcli  --api-base-url $CORTEX_URL --api-key $API_KEY --api-key-id $API_ID image scan ubuntu:18.04
+
