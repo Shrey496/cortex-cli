@@ -34,7 +34,6 @@ jobs:
 
       - name: Cortex CLI install
         env:
-        # These names must match what you use in the script above
           CORTEX_URL: ${{ secrets.CORTEX_URL }}
           API_ID: ${{ secrets.API_ID }}
           API_KEY: ${{ secrets.API_KEY }}
@@ -66,6 +65,10 @@ jobs:
 
         
       - name: Cortex CLI execution
+        env:
+          CORTEX_URL: ${{ secrets.CORTEX_URL }}
+          API_ID: ${{ secrets.API_ID }}
+          API_KEY: ${{ secrets.API_KEY }}
         run: |
           sudo ./cortexcli  --api-base-url $CORTEX_URL --api-key $API_KEY --api-key-id $API_ID image scan ubuntu:18.04
 
