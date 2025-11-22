@@ -8,7 +8,7 @@
   * **actions/checkout@v4** step checks out the repository under $GITHUB_WORKSPACE, so the job can access it.
   * Build the Docker image using the Dockerfile
   * Download [Cortex CLI dependencies](https://docs-cortex.paloaltonetworks.com/r/Cortex-Cloud-Posture-Management/Code-Security/Connect-Cortex-CLI) based on the OS of the machine (The current job **runs-on** `ubuntu:latest`)
-  * Ensure the URL, API key, API ID are added as environment variables post storing them as Secrets (Settings > Secrets and variables > Actions > New repository secret)
+  * Ensure the **URL**, **API key**, **API ID** are added as environment variables post storing them as Secrets (**Settings > Secrets and variables > Actions > New repository secret**)
   * The **image name** should be set before defining **steps** as best practice
   * Add the **Cortex CLI install** command as a step (Copy it from the Cortex Console data sources page)
   * Add the **Cortex CLI image scan** as another step
