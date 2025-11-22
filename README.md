@@ -14,6 +14,7 @@
   * The **image name** should be set before defining **steps** as best practice
   * Add the **Cortex CLI install** command as a step (Copy it from the Cortex Console data sources page)
   * Add the **Cortex CLI image scan** as another step
+  * On every commit to the **main branch**, **Actions** will run the pipeline
  
 Once the above steps are completed, the output under the Actions tab for the **Cortex CLI execution** to find the results of the scan displayed as a table.
 
