@@ -3,7 +3,7 @@
 ### Steps: 
 * Clone this repository.
 * Add the Dockerfile of the image that needs to be built and scanned.
-* Create a basic Github Actions workflow (already created in this repository, the comments added in the blank.yml file explain the structure of the file)
+* Create a basic Github Actions workflow. (already created in this repository, the comments added in the blank.yml file explain the structure of the file)
 * Add the required steps in the blank.yml file in order to orchestrate GitHub Actions workflow:
   * **actions/checkout@v4** step checks out the repository under $GITHUB_WORKSPACE, so the job can access it.
   * Build the Docker image using the Dockerfile
