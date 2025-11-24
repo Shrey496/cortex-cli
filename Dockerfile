@@ -1,2 +1,2 @@
 # Dockerfile
-FROM node:12.18.0-alpine
+FROM ubuntu:18.04
