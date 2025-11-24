@@ -15,11 +15,18 @@
   * Add the **Cortex CLI install** command as a step (Copy it from the Cortex Console data sources page)
   * Add the **Cortex CLI image scan** as another step
   * On every commit to the **main branch**, **Actions** will run the pipeline
- 
+  * Please make sure an active **Prevention** policy is present at **Cortex Cloud > Posture Management > Rules & Policies > Vulnerability     Management > Vulnerability Policies - Prevention**
+
+  <img width="893" height="640" alt="Screenshot 2025-11-24 at 3 26 17 PM" src="https://github.com/user-attachments/assets/525f8717-08b1-4b57-bae7-baa72ed70f11" />
+
+  <img width="924" height="569" alt="Screenshot 2025-11-24 at 3 26 28 PM" src="https://github.com/user-attachments/assets/fd1109a4-53d7-4a52-ace6-3df2e0ae825a" />
+
+  <img width="916" height="786" alt="Screenshot 2025-11-24 at 3 26 38 PM" src="https://github.com/user-attachments/assets/9f7ac4d4-375a-4b8a-bd4c-702e101d8063" />
+
+  
 Once the above steps are completed, the output under the Actions tab for the **Cortex CLI execution** to find the results of the scan displayed as a table.
 
-<img width="914" height="256" alt="Screenshot 2025-11-22 at 12 12 55 AM" src="https://github.com/user-attachments/assets/2d72242a-f53f-4640-9d2f-fe5468f2b18d" />
-
+<img width="1048" height="352" alt="Screenshot 2025-11-24 at 3 21 56 PM" src="https://github.com/user-attachments/assets/b83d54fd-80d0-4025-9f36-90f139294ae0" />
 
 
 The same setup can be used for [Cortex CLI SBOM](https://docs-cortex.paloaltonetworks.com/r/Cortex-CLOUD/Cortex-Cloud-Runtime-Security-Documentation/Cortex-CLI-for-Cloud-Workload-Protection) scan too with slight modification/updating the deployment YAML file. (blank.yml)
