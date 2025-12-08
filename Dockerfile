@@ -1,2 +1,2 @@
 # Dockerfile
-FROM nginx:1.9.4
+FROM nginx:1.28.0

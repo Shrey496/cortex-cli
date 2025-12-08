@@ -30,7 +30,7 @@ jobs:
       CORTEX_URL: ${{ secrets.CORTEX_URL }}
       API_ID: ${{ secrets.API_ID }}
       API_KEY: ${{ secrets.API_KEY }}
-      IMAGE_NAME: "nginx:1.9.4"
+      IMAGE_NAME: "nginx:1.28.0"
 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t $IMAGE_NAME . # Build the image, tagging it 'ubuntu:18.04'
+        run: docker build -t $IMAGE_NAME .
 
       - name: Download Cortex dependencies
         run: |
