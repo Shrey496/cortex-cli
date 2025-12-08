@@ -1,2 +1,2 @@
 # Dockerfile
-FROM ubuntu:18.04
+FROM nginx:1.9.4

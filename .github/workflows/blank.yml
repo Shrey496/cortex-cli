@@ -30,7 +30,7 @@ jobs:
       CORTEX_URL: ${{ secrets.CORTEX_URL }}
       API_ID: ${{ secrets.API_ID }}
       API_KEY: ${{ secrets.API_KEY }}
-      IMAGE_NAME: "ubuntu:18.04"
+      IMAGE_NAME: "nginx:1.9.4"
 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
