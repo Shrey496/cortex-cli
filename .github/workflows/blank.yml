@@ -39,7 +39,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build Docker image
-        run: docker build -t $IMAGE_NAME .
+        run: docker build -t $IMAGE_NAME . 
 
       - name: Download Cortex dependencies
         run: |
