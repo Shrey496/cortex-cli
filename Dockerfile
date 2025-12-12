@@ -1,2 +1,2 @@
 # Dockerfile
-FROM nginx:1.28
+FROM alpine:3.14
