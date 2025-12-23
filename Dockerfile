@@ -1,2 +1,2 @@
 # Dockerfile
-FROM alpine:3.14
+FROM node:lts-trixie-slim
