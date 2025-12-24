@@ -69,6 +69,9 @@ jobs:
           # Make the downloaded file executable
           chmod +x $crtx_file
 
+          #Display Cortex CLI version
+          ./cortexcli --version
+
       - name: Cortex CLI execution
         run: |
           sudo ./cortexcli  --api-base-url $CORTEX_URL --api-key $API_KEY --api-key-id $API_ID image scan $IMAGE_NAME
