@@ -27,9 +27,9 @@ jobs:
 
     #Adding env. varibales globally to retrieve Secrets from Github, and set image name
     env:
-      CORTEX_URL: ${{ secrets.CORTEX_URL }}
-      API_ID: ${{ secrets.API_ID }}
-      API_KEY: ${{ secrets.API_KEY }}
+      CORTEX_URL: ${{ vars.CORTEX_URL }}
+      API_ID: ${{ vars.API_ID }}
+      API_KEY: ${{ secrets.API_KEY_X5 }}
       IMAGE_NAME: "node:lts-trixie-slim"
 
 
