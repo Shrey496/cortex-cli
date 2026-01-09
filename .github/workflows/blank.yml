@@ -30,7 +30,7 @@ jobs:
       CORTEX_URL: ${{ vars.CORTEX_URL }}
       API_ID: ${{ vars.API_ID }}
       API_KEY: ${{ secrets.API_KEY_X5_PROD}}
-      IMAGE_NAME: "node:lts-trixie-slim"
+      IMAGE_NAME: "abc:latest"
 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
