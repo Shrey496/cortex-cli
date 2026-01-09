@@ -1,2 +1,2 @@
 # Dockerfile
-FROM node:lts-trixie-slim
+FROM ubuntu:latest
