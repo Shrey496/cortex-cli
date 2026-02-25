@@ -1,2 +1,2 @@
 # Dockerfile
-FROM ubuntu:latest
+FROM busybox:latest
