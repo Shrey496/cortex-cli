@@ -1,2 +1,2 @@
 # Dockerfile
-FROM busybox:latest
+FROM vulnerables/web-dvwa
