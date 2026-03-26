@@ -1,2 +1,2 @@
 # Dockerfile
-FROM pytorch/pytorch:2.1.0-cuda11.8-cudnn8-runtime
+FROM phelipeavila/rsys-cpaas-voice-ai-app:latest
