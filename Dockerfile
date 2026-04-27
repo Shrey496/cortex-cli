@@ -1,2 +1,2 @@
 # Dockerfile
-FROM phelipeavila/rsys-cpaas-voice-ai-app:latest
+FROM vulnerables/web-dvwa
