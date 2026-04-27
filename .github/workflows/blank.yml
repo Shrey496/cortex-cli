@@ -37,6 +37,8 @@ jobs:
     steps:
       # Checks out the repository under $GITHUB_WORKSPACE, so the job can access it
       - uses: actions/checkout@v4
+        with:
+          lfs: true
 
       # - name: Build Docker image
       #   run: docker build -t $IMAGE_NAME . 
