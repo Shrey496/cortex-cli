@@ -1,2 +1,2 @@
 # Dockerfile
-FROM vulnerables/web-dvwa
+FROM debian:buster

@@ -30,7 +30,7 @@ jobs:
       CORTEX_URL: ${{ vars.CORTEX_URL }}
       API_ID: ${{ vars.API_ID }}
       API_KEY: ${{ secrets.API_KEY_X5_PROD}}
-      IMAGE_NAME: "devopssharedregistry.azurecr.io/apiteam.customerorg.routecode:1.0.0-31-854e7bf-feat-manoj-cortex-image-scan"
+      IMAGE_NAME: "debian:buster"
 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -40,12 +40,12 @@ jobs:
         with:
           lfs: true
 
-      # - name: Build Docker image
-      #   run: docker build -t $IMAGE_NAME . 
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME . 
 
-      - name: Docker load from the tar file
-        run: | 
-          docker load -i cortex_scan_image.tar
+      # - name: Docker load from the tar file
+      #   run: | 
+      #     docker load -i cortex_scan_image.tar
 
       - name: Download Cortex dependencies
         run: |
