@@ -30,7 +30,7 @@ jobs:
       CORTEX_URL: ${{ vars.CORTEX_URL }}
       API_ID: ${{ vars.API_ID }}
       API_KEY: ${{ secrets.API_KEY_X5_PROD}}
-      IMAGE_NAME: "cortex-scan-target"
+      IMAGE_NAME: "cortex-scan-target:latest"
 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -52,6 +52,8 @@ jobs:
 
           docker tag "$IMAGE_ID" $IMAGE_NAME
           echo "Successfully tagged $IMAGE_ID as $IMAGE_NAME"
+
+          docker images
 
       - name: Download Cortex dependencies
         run: |
