@@ -1,2 +1,2 @@
 # Dockerfile
-FROM debian:buster
+FROM postgres:16.14-trixie
