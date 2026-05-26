@@ -30,7 +30,7 @@ jobs:
       CORTEX_URL: ${{ vars.CORTEX_URL }}
       API_ID: ${{ vars.API_ID }}
       API_KEY: ${{ secrets.API_KEY_X5_PROD}}
-      IMAGE_NAME: "debian:buster"
+      IMAGE_NAME: "postgres:16.14-trixie"
 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
