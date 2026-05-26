@@ -30,7 +30,7 @@ jobs:
       CORTEX_URL: ${{ vars.CORTEX_URL }}
       API_ID: ${{ vars.API_ID }}
       API_KEY: ${{ secrets.API_KEY_X5_PROD}}
-      IMAGE_NAME: "postgres:16.14-trixie"
+      IMAGE_NAME: "cortex-scan-target"
 
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -43,9 +43,15 @@ jobs:
       - name: Build Docker image
         run: docker build -t $IMAGE_NAME . 
 
-      # - name: Docker load from the tar file
-      #   run: | 
-      #     docker load -i cortex_scan_image.tar
+      - name: Docker load from the tar file and force tag
+        run: |
+          LOAD_OUTPUT=$(docker load -i 04051405_2026-05-26_etf-ordenes-front.tar)
+          echo "$LOAD_OUTPUT"
+
+          IMAGE_ID=$(echo "$LOAD_OUTPUT" | grep -oE 'sha256:[a-f0-9]+|Loaded image: .*' | sed 's/Loaded image: //')
+
+          docker tag "$IMAGE_ID" $IMAGE_NAME
+          echo "Successfully tagged $IMAGE_ID as $IMAGE_NAME"
 
       - name: Download Cortex dependencies
         run: |
