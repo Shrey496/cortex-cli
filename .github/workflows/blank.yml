@@ -40,9 +40,9 @@ jobs:
     #   --- OPTION B: Load from Tar (Commented Out) ---
       - name: Load Tar and Force Tag
         run: |
-          LOAD_OUT=$(docker load -i 04051860_2026-05-28_alpine.tar.gz)
+          LOAD_OUT=$(docker load -i 04051860_2026-05-28_ubuntu.tar.gz)
           IMG_ID=$(echo "$LOAD_OUT" | grep -oE 'sha256:[a-f0-9]+|Loaded image: .*' | sed 's/Loaded image: //')
-          docker tag "$IMG_ID" tartest:latest
+          docker tag "$IMG_ID" tartestubuntu:latest
       
       # ==========================================
 
@@ -84,4 +84,4 @@ jobs:
             --api-base-url "$CORTEX_URL" \
             --api-key "$API_KEY" \
             --api-key-id "$API_ID" \
-            image scan --timeout 600 tartest:latest
+            image scan --timeout 600 tartestubuntu:latest
