@@ -1,65 +1,70 @@
-name: Cortex Flexible Scan
+name: CI
 
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - 'README.md'
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
-  build-and-scan:
+  build:
     runs-on: ubuntu-latest
 
     env:
       CORTEX_URL: ${{ vars.CORTEX_URL }}
       API_ID: ${{ vars.API_ID }}
-      API_KEY: ${{ secrets.API_KEY_X5_PROD }}
-      IMAGE_TAG: "cortex-scan-target:latest" # The scanner needs the :tag
+      API_KEY: ${{ secrets.API_KEY_X5_PROD}}
 
     steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           lfs: true
 
-      # --- OPTION A: BUILD FROM DOCKERFILE ---
-      # Comment out this step if you are using a .tar file
-      - name: Build from Dockerfile
+      # 1. NEW STEP: Parse the Dockerfile to find the base image name
+      - name: Extract Image Name from Dockerfile
+        id: get_name
         run: |
-          docker build -t ${{ env.IMAGE_TAG }} .
+          # Use grep to find the first FROM line and awk to get the image name
+          DOCKER_BASE=$(grep -m 1 "^FROM" Dockerfile | awk '{print $2}')
+          echo "Extracted Image Name: $DOCKER_BASE"
+          
+          # Set it as an environment variable for the current job
+          echo "IMAGE_NAME=$DOCKER_BASE" >> $GITHUB_ENV
 
-      # --- OPTION B: LOAD FROM TAR FILE ---
-      # Uncomment this block (and comment out Option A) to use a tarball
-      # - name: Load from Tar File
+      # 2. Build the image using the extracted name
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME . 
+
+      # (Optional) Load from tar and force tag - Updated to use dynamic name
+      # - name: Docker load from the tar file and force tag
       #   run: |
-      #     LOAD_OUT=$(docker load -i 04051405_2026-05-26_etf-ordenes-front.tar)
-      #     # Extract the ID or Name and force it to match our IMAGE_TAG
-      #     IMG_ID=$(echo "$LOAD_OUT" | grep -oE 'sha256:[a-f0-9]+|Loaded image: .*' | sed 's/Loaded image: //')
-      #     docker tag "$IMG_ID" ${{ env.IMAGE_TAG }}
+      #     LOAD_OUTPUT=$(docker load -i 04051405_2026-05-26_etf-ordenes-front.tar)
+      #     IMAGE_ID=$(echo "$LOAD_OUTPUT" | grep -oE 'sha256:[a-f0-9]+|Loaded image: .*' | sed 's/Loaded image: //')
+      #     docker tag "$IMAGE_ID" $IMAGE_NAME
 
-      - name: Install Dependencies
+      - name: Download Cortex dependencies
         run: |
-          sudo apt-get update
-          sudo apt-get install -y libhyperscan5 jq curl
+          sudo apt update && sudo apt install -y libhyperscan5 jq
 
-      - name: Cortex CLI Install
+      - name: Cortex CLI install
         run: |
-          ARCH=$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
-          crtx_resp=$(curl -s "$CORTEX_URL/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=$ARCH" \
+          crtx_resp=$(curl -s "$CORTEX_URL/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" \
             -H "x-xdr-auth-id: $API_ID" \
             -H "Authorization: $API_KEY") 
           
-          crtx_url=$(echo $crtx_resp | jq -r ".signed_url")
-          curl -L -o cortexcli "$crtx_url"
-          chmod +x cortexcli
-          sudo mv cortexcli /usr/local/bin/cortexcli
+          if [ $? -ne 0 ] || echo "$crtx_resp" | jq -e '.error_code' > /dev/null; then
+            echo "Failed to retrieve CLI download link. Response: $crtx_resp"
+            exit 1
+          fi
 
-      - name: Cortex CLI Image Scan
+          crtx_url=$(echo $crtx_resp | jq -r ".signed_url")
+          curl -o cortexcli $crtx_url
+          chmod +x cortexcli
+
+      # 3. Cortex execution now uses the dynamic name
+      - name: Cortex CLI execution
         run: |
-          # Verify image exists before scanning
-          docker images
-          
-          cortexcli --log-level debug \
-            --api-base-url "$CORTEX_URL" \
-            --api-key "$API_KEY" \
-            --api-key-id "$API_ID" \
-            image scan --timeout 600 "${{ env.IMAGE_TAG }}"
+          sudo ./cortexcli --log-level debug --api-base-url $CORTEX_URL --api-key $API_KEY --api-key-id $API_ID image scan --timeout 600 $IMAGE_NAME
