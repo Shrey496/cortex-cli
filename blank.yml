@@ -1,91 +1,57 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
-    branches: [ "main" ]
-
-  #README commits DO NOT trigger the pipeline
-    paths-ignore:
-      - 'README.md'
-
-  pull_request:
-    branches: [ "main" ]
-
-  # Allows running this workflow manually from the Actions tab
+    # This captures EVERY push to ANY branch to ensure we trigger
+    branches: ["**"]
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
-
-    #Adding env. varibales globally to retrieve Secrets from Github, and set image name
     env:
       CORTEX_URL: ${{ vars.CORTEX_URL }}
       API_ID: ${{ vars.API_ID }}
-      API_KEY: ${{ secrets.API_KEY_X5_PROD}}
-      IMAGE_NAME: "alpine:3.20.8"
+      API_KEY: ${{ secrets.API_KEY_X5_PROD }}
 
-
-    # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
-      # Checks out the repository under $GITHUB_WORKSPACE, so the job can access it
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Build Docker image
-        run: docker build -t $IMAGE_NAME . 
-
-      # - name: Docker load from the tar file and force tag
-      #   run: |
-      #     LOAD_OUTPUT=$(docker load -i 04051405_2026-05-26_etf-ordenes-front.tar)
-      #     echo "$LOAD_OUTPUT"
-
-      #     IMAGE_ID=$(echo "$LOAD_OUTPUT" | grep -oE 'sha256:[a-f0-9]+|Loaded image: .*' | sed 's/Loaded image: //')
-
-      #     docker tag "$IMAGE_ID" $IMAGE_NAME
-      #     echo "Successfully tagged $IMAGE_ID as $IMAGE_NAME"
-
-      #     docker images
-
-      - name: Download Cortex dependencies
+      - name: Extract Image Name from Dockerfile
+        id: get_name
         run: |
-          sudo apt install libhyperscan5
-          sudo apt-get install jq
+          # Grabs the base image name (e.g., alpine:3.20.8)
+          DOCKER_BASE=$(grep "^FROM" Dockerfile | tail -n 1 | awk '{print $2}')
+          echo "IMAGE_NAME=$DOCKER_BASE" >> $GITHUB_ENV
+          echo "Extracted Name: $DOCKER_BASE"
+
+      # --- MODE 1: BUILD (Active) ---
+      - name: Build Docker image
+        run: docker build -t $IMAGE_NAME .
+
+      # --- MODE 2: LOAD (Commented out) ---
+      # To use this, put a '#' in front of the Build step above and remove '#' below
+      # - name: Docker load and Rename
+      #   run: |
+      #     LOAD_OUT=$(docker load -i 04051405_2026-05-26_etf-ordenes-front.tar)
+      #     IMG_ID=$(echo "$LOAD_OUT" | grep -oE 'sha256:[a-f0-9]+|Loaded image: .*' | sed 's/Loaded image: //')
+      #     docker tag "$IMG_ID" $IMAGE_NAME
+
+      - name: Install Dependencies
+        run: sudo apt update && sudo apt install -y libhyperscan5 jq
 
       - name: Cortex CLI install
         run: |
           crtx_resp=$(curl -s "$CORTEX_URL/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=amd64" \
             -H "x-xdr-auth-id: $API_ID" \
-            -H "Authorization: $API_KEY") 
-            
-          # Check if the curl command was successful before proceeding
-          if [ $? -ne 0 ] || echo "$crtx_resp" | jq -e '.error_code' > /dev/null; then
-            echo "Failed to retrieve CLI download link. Response: $crtx_resp"
-            exit 1
-          fi
-
-          # Parse the response using jq
+            -H "Authorization: $API_KEY")
           crtx_url=$(echo $crtx_resp | jq -r ".signed_url")
-          crtx_file=$(echo $crtx_resp | jq -r ".file_name")
-          
-          # Download the file using the signed URL
-          echo "Downloading $crtx_file from signed URL..."
-          curl -o $crtx_file $crtx_url
-          
-          # Make the downloaded file executable
-          chmod +x $crtx_file
-
-          #Display Cortex CLI version
-          ./cortexcli --version
+          curl -L -o cortexcli "$crtx_url"
+          chmod +x cortexcli
 
       - name: Cortex CLI execution
         run: |
-          sudo ./cortexcli --log-level debug --api-base-url $CORTEX_URL --api-key $API_KEY --api-key-id $API_ID image scan --timeout 600 $IMAGE_NAME
+          sudo ./cortexcli --log-level debug --api-base-url "$CORTEX_URL" --api-key "$API_KEY" --api-key-id "$API_ID" image scan --timeout 600 "$IMAGE_NAME"
