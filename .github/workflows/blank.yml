@@ -21,13 +21,13 @@ jobs:
         with:
           lfs: true # Critical if you are pulling a large .tar file
 
-      - name: Extract Image Name from Dockerfile
-        id: get_name
-        run: |
-          # Grabs the final base image name (e.g., alpine:3.20.8)
-          DOCKER_BASE=$(grep "^FROM" Dockerfile | tail -n 1 | awk '{print $2}')
-          echo "IMAGE_NAME=$DOCKER_BASE" >> $GITHUB_ENV
-          echo "Scanner will target: $DOCKER_BASE"
+    #   - name: Extract Image Name from Dockerfile
+    #     id: get_name
+    #     run: |
+    #       # Grabs the final base image name (e.g., alpine:3.20.8)
+    #       DOCKER_BASE=$(grep "^FROM" Dockerfile | tail -n 1 | awk '{print $2}')
+    #       echo "IMAGE_NAME=$DOCKER_BASE" >> $GITHUB_ENV
+    #       echo "Scanner will target: $DOCKER_BASE"
 
       # ==========================================
       # IMAGE SOURCING (Choose ONE block below)
@@ -40,9 +40,9 @@ jobs:
     #   --- OPTION B: Load from Tar (Commented Out) ---
       - name: Load Tar and Force Tag
         run: |
-          LOAD_OUT=$(docker load -i 04051405_2026-05-26_etf-ordenes-front.tar)
+          LOAD_OUT=$(docker load -i 04051860_2026-05-28_alpine.tar.gz)
           IMG_ID=$(echo "$LOAD_OUT" | grep -oE 'sha256:[a-f0-9]+|Loaded image: .*' | sed 's/Loaded image: //')
-          docker tag "$IMG_ID" $IMAGE_NAME
+          docker tag "$IMG_ID" tartest:latest
       
       # ==========================================
 
