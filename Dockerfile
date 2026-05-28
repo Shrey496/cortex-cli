@@ -1,2 +1,2 @@
 # Dockerfile
-FROM postgres:16.14-trixie
+FROM alpine:3.20.8

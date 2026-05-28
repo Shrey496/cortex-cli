@@ -1,0 +1,65 @@
+name: Cortex Flexible Scan
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build-and-scan:
+    runs-on: ubuntu-latest
+
+    env:
+      CORTEX_URL: ${{ vars.CORTEX_URL }}
+      API_ID: ${{ vars.API_ID }}
+      API_KEY: ${{ secrets.API_KEY_X5_PROD }}
+      IMAGE_TAG: "cortex-scan-target:latest" # The scanner needs the :tag
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      # --- OPTION A: BUILD FROM DOCKERFILE ---
+      # Comment out this step if you are using a .tar file
+      - name: Build from Dockerfile
+        run: |
+          docker build -t ${{ env.IMAGE_TAG }} .
+
+      # --- OPTION B: LOAD FROM TAR FILE ---
+      # Uncomment this block (and comment out Option A) to use a tarball
+      # - name: Load from Tar File
+      #   run: |
+      #     LOAD_OUT=$(docker load -i 04051405_2026-05-26_etf-ordenes-front.tar)
+      #     # Extract the ID or Name and force it to match our IMAGE_TAG
+      #     IMG_ID=$(echo "$LOAD_OUT" | grep -oE 'sha256:[a-f0-9]+|Loaded image: .*' | sed 's/Loaded image: //')
+      #     docker tag "$IMG_ID" ${{ env.IMAGE_TAG }}
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libhyperscan5 jq curl
+
+      - name: Cortex CLI Install
+        run: |
+          ARCH=$(uname -m | sed 's/x86_64/amd64/' | sed 's/aarch64/arm64/')
+          crtx_resp=$(curl -s "$CORTEX_URL/public_api/v1/unified-cli/releases/download-link?os=linux&architecture=$ARCH" \
+            -H "x-xdr-auth-id: $API_ID" \
+            -H "Authorization: $API_KEY") 
+          
+          crtx_url=$(echo $crtx_resp | jq -r ".signed_url")
+          curl -L -o cortexcli "$crtx_url"
+          chmod +x cortexcli
+          sudo mv cortexcli /usr/local/bin/cortexcli
+
+      - name: Cortex CLI Image Scan
+        run: |
+          # Verify image exists before scanning
+          docker images
+          
+          cortexcli --log-level debug \
+            --api-base-url "$CORTEX_URL" \
+            --api-key "$API_KEY" \
+            --api-key-id "$API_ID" \
+            image scan --timeout 600 "${{ env.IMAGE_TAG }}"
