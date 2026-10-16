@@ -84,4 +84,5 @@ jobs:
             --api-base-url "$CORTEX_URL" \
             --api-key "$API_KEY" \
             --api-key-id "$API_ID" \
-            image scan --upload-mode no-upload $IMAGE_NAME
+            --upload-mode no-upload \
+            image scan --timeout 300 $IMAGE_NAME
